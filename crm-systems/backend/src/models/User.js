@@ -26,6 +26,13 @@ const userSchema = new Schema({
     enum: ["admin", "user", "manager"],
     default: "user"
   },
+
+  department : {
+    type: String,
+    enum: ["sales", "leads"],
+    
+  },
+
   isActive: {
     type: Boolean,
     default: true,
@@ -38,7 +45,8 @@ const userSchema = new Schema({
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
 
-  this.password = await bcrypt.hash(this.password, process.env.HASH_SALT);
+  const saltRounds = Number(process.env.BCRYPT_COST);
+  this.password = await bcrypt.hash(this.password, saltRounds);
 
 });
 

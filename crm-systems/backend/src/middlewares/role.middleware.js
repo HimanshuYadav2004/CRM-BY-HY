@@ -4,8 +4,8 @@ import express from "express";
 
 const authorizeRoles = (...allowedRoles) => {
 
-    //actual middle function is returned from below 
-    
+//actual middle function is returned from below 
+
   return (req, res, next) => {
     if (!req.user) {
       return res.status(401).json({
@@ -13,12 +13,14 @@ const authorizeRoles = (...allowedRoles) => {
       });
     }
 
+    
     if (!allowedRoles.includes(req.user.role)) {
       return res.status(403).json({
         message: "Access denied",
       });
-      next();
+    
     }
+      next();
   };
 };
 

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import User from "../models/User";
+import User from "../models/User.js";
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -22,9 +22,12 @@ const authMiddleware = async (req, res, next) => {
 
     //decoded have userId , userroles, iat
 
+    
     //3 - find user from DB
 
-    const user = User.findById(decoded.userId);
+      const user = await User.findById(decoded.userId);
+      
+      console.log(user)
 
     if (!user || !user.isActive) {
       return res.status(401).json({
