@@ -2,6 +2,7 @@ import express from 'express'
 import authRoutes from './routes/auth.routes.js'
 import adminRoutes from './routes/admin.routes.js'
 import leadRoutes from './routes/lead.routes.js'
+import taskRoutes from './routes/task.routes.js'
 import cors from "cors";
 
 //starting the app
@@ -9,12 +10,18 @@ const app = express();
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "http://localhost:5174",
-      "http://192.168.1.53:5173",
-      "http://192.168.1.53:5174"
-    ],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://localhost:5174",
+        ...(process.env.FRONTEND_URL ? process.env.FRONTEND_URL.split(",") : [])
+      ];
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -28,8 +35,8 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 
 app.use('/api/admin', adminRoutes);
-
-app.use('/api/leads', leadRoutes)
+app.use('/api/leads', leadRoutes);
+app.use('/api/tasks', taskRoutes);
 
 
 

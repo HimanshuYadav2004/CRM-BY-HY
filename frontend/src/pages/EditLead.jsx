@@ -55,7 +55,7 @@ const EditLead = () => {
     try {
       await updateLead(id, formData);
       toast.success("Lead updated successfully");
-      navigate("/admin/leads");
+      navigate("/dashboard/leads");
     } catch (err) {
       console.error(err);
       const msg = err.response?.data?.message || "Failed to update lead";

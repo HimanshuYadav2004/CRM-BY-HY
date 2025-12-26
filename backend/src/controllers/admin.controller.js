@@ -1,4 +1,6 @@
 import User from "../models/User.js";
+import Lead from "../models/Lead.js";
+import Task from "../models/Task.js";
 import { createUserSchema } from "../validators/user.schema.js";
 import generatePassword from "../utils/generatePassword.js";
 import { ZodError } from "zod";
@@ -63,4 +65,69 @@ export const createUser = async (req, res) => {
       message: "Server error",
     });
   }
+};
+
+export const getUsers = async (req, res) => {
+    try {
+        const users = await User.find().select("-password").sort({ createdAt: -1 });
+        res.status(200).json({ users });
+    } catch (error) {
+        res.status(500).json({ message: "Server error" });
+    }
+};
+
+export const toggleUserStatus = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const user = await User.findById(id);
+  
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+  
+      if (user.role === 'admin') {
+          return res.status(400).json({ message: "Cannot deactivate admin" });
+      }
+  
+      user.isActive = !user.isActive;
+      await user.save();
+  
+      res.status(200).json({ message: "User status updated", user });
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  };
+
+export const getAnalytics = async (req, res) => {
+    try {
+        // Leads Aggregation
+        const totalLeads = await Lead.countDocuments();
+        
+        const leadsByStatus = await Lead.aggregate([
+            { $group: { _id: "$status", count: { $sum: 1 } } }
+        ]);
+
+        const leadsBySource = await Lead.aggregate([
+            { $group: { _id: "$source", count: { $sum: 1 } } }
+        ]);
+
+        // Tasks Aggregation
+        const totalTasks = await Task.countDocuments();
+        const pendingTasks = await Task.countDocuments({ status: "pending" });
+        const completedTasks = await Task.countDocuments({ status: "completed" });
+
+        res.status(200).json({
+            totalLeads,
+            leadsByStatus,
+            leadsBySource,
+            tasks: {
+                total: totalTasks,
+                pending: pendingTasks,
+                completed: completedTasks
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error fetching analytics" });
+    }
 };

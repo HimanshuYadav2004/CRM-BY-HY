@@ -28,7 +28,7 @@ const CreateLead = () => {
     try {
       await createLead(formData);
       toast.success("Lead created successfully");
-      navigate("/admin/leads");
+      navigate("/dashboard/leads");
     } catch (err) {
       console.error(err);
       const msg = err.response?.data?.message || "Failed to create lead";

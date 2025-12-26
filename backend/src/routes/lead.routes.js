@@ -12,18 +12,18 @@ import {
 const router = express.Router();
 
 // CREATE lead 
-router.post("/", authMiddleware, authorizeRoles("admin"), createLead);
+router.post("/", authMiddleware, authorizeRoles("admin", "user", "manager"), createLead);
 
 // READ all leads 
-router.get("/", authMiddleware, authorizeRoles("admin"), getLeads);
+router.get("/", authMiddleware, authorizeRoles("admin", "user", "manager"), getLeads);
 
 // READ single lead
-router.get("/:id", authMiddleware, authorizeRoles("admin"), getLeadById);
+router.get("/:id", authMiddleware, authorizeRoles("admin", "user", "manager"), getLeadById);
 
 // UPDATE 
-router.put("/:id", authMiddleware, authorizeRoles("admin"), updateLead);
+router.put("/:id", authMiddleware, authorizeRoles("admin", "user", "manager"), updateLead);
 
-// DELETE 
+// DELETE (Admin only for now?) Let's keep delete admin only
 router.delete("/:id", authMiddleware, authorizeRoles("admin"), deleteLead);
 
 export default router;

@@ -41,7 +41,19 @@ export const createLead = async (req, res) => {
  */
 export const getLeads = async (req, res) => {
   try {
-    const leads = await Lead.find()
+    let query = {};
+    
+    // If user is not admin, only show their leads
+    if (req.user.role !== 'admin') {
+      query = {
+        $or: [
+          { assignedTo: req.user._id },
+          { createdBy: req.user._id }
+        ]
+      };
+    }
+
+    const leads = await Lead.find(query)
       .populate("assignedTo", "name email role")
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
