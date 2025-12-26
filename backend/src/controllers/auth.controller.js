@@ -63,6 +63,7 @@ export const login = async (req, res) => {
       },
     });
   } catch (error) {
+      console.log(error);
     if (error instanceof ZodError) {
       return res.status(400).json({
         message: "Validation failed",
@@ -73,6 +74,7 @@ export const login = async (req, res) => {
       });
     }
     res.status(500).json({
+    
       message: "Server error",
     });
   }
